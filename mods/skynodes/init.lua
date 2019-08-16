@@ -78,10 +78,33 @@ else
 end
 
 local NodeChoices = Random:new()
-NodeChoices:add_choice("default:stone", 90)
-NodeChoices:add_choice("default:pine_tree", 9.5)
-NodeChoices:add_choice("default:water_source", 0.5)
+NodeChoices:add_choice("filler_node", 89)
+NodeChoices:add_choice("wood", 9.5)
+NodeChoices:add_choice("water", 0.5)
+NodeChoices:add_choice("ore", 1)
 NodeChoices:calc_csum()
+
+local filler_nodes = {
+    "default:stone",
+    "default:dirt"
+}
+
+local ores = {
+    "default:stone_with_coal",
+    "default:stone_with_iron",
+    "default:stone_with_copper",
+    "default:stone_with_tin",
+    "default:stone_with_gold",
+    "default:stone_with_mese",
+    "default:stone_with_diamond"
+}
+
+local nodetype_lookup = {
+    ["filler_node"] = function() return filler_nodes[math.random(#filler_nodes)] end,
+    ["wood"] = function() return "default:pine_tree" end,
+    ["water"] = function() return "default:water_source" end,
+    ["ore"] = function() return ores[math.random(#ores)] end
+}
 
 local timer = 0
 minetest.register_globalstep(function (dtime)
@@ -93,7 +116,7 @@ minetest.register_globalstep(function (dtime)
         local z = math.random(0, world_size)
         local pos = {x=x, y=10 + levels[x][z], z=z}
 
-        local chosen_node = NodeChoices:choose()
+        local chosen_node = nodetype_lookup[NodeChoices:choose()]()
 
         minetest.set_node(pos, {name=chosen_node})
         minetest.spawn_falling_node(pos)
