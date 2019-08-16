@@ -74,9 +74,14 @@ local ores = {
     "default:stone_with_diamond"
 }
 
+local fillerNodes = {
+    "default:dirt",
+    "default:stone"
+}
+
 local node_type_functions = {
     ["wood"] = function() return "default:pine_tree" end,
-    ["stone"] = function() return "default:stone" end,
+    ["stone"] = function() return fillerNodes[math.random(#fillerNodes)] end,
     ["water"] = function() return "default:water_source" end,
     ["ore"] = function()
         return ores[math.random(#ores)]
