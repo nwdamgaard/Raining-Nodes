@@ -58,49 +58,6 @@ minetest.register_on_mods_loaded(function()
     end
 end)
 
-local probabilities = {
-    node_types = {"wood", "stone", "water", "ore"},
-    weight =     {0.04,    0.949,   0.001,  0.01},
-    csum =       {0.04,    0.989,   0.99,    1.0}
-}
-
-local ores = {
-    "default:stone_with_coal",
-    "default:stone_with_iron",
-    "default:stone_with_copper",
-    "default:stone_with_tin",
-    "default:stone_with_gold",
-    "default:stone_with_mese",
-    "default:stone_with_diamond"
-}
-
-local fillerNodes = {
-    "default:dirt",
-    "default:stone"
-}
-
-local node_type_functions = {
-    ["wood"] = function() return "default:pine_tree" end,
-    ["stone"] = function() return fillerNodes[math.random(#fillerNodes)] end,
-    ["water"] = function() return "default:water_source" end,
-    ["ore"] = function()
-        return ores[math.random(#ores)]
-    end
-}
-
-function choose_node()
-    local chosen_node_type
-    local r = math.random()
-    for i, csum in pairs(probabilities.csum) do
-        if(r < csum) then
-            chosen_node_type = probabilities.node_types[i]
-            break
-        end
-    end
-
-    return node_type_functions[chosen_node_type]()
-end
-
 local levels = {}
 if storage:contains("levels") then
     for x = 0,world_size do
@@ -120,6 +77,12 @@ else
     end
 end
 
+local NodeChoices = Random:new()
+NodeChoices:add_choice("default:stone", 90)
+NodeChoices:add_choice("default:pine_tree", 9.5)
+NodeChoices:add_choice("default:water_source", 0.5)
+NodeChoices:calc_csum()
+
 local timer = 0
 minetest.register_globalstep(function (dtime)
     timer = timer + dtime
@@ -130,7 +93,7 @@ minetest.register_globalstep(function (dtime)
         local z = math.random(0, world_size)
         local pos = {x=x, y=10 + levels[x][z], z=z}
 
-        local chosen_node = choose_node()
+        local chosen_node = NodeChoices:choose()
 
         minetest.set_node(pos, {name=chosen_node})
         minetest.spawn_falling_node(pos)

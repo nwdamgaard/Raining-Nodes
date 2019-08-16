@@ -1,8 +1,8 @@
 
 Random = {
-    choices = {}
-    probabilities = {}
-    csum = {}
+    choices = {},
+    probabilities = {},
+    csum = {},
     sum = 0
 }
 
@@ -16,7 +16,7 @@ end
 -- important! choose() will not work if csum is not calculated!
 function Random:calc_csum()
     local sum = 0
-    for i, choice in pairs(self.choices) do
+    for i, choice in ipairs(self.choices) do
         --ensure that each choice has a probability
         if self.probabilities[choice] == nil then
             minetest.log("error", "Random API: Table does not have a probability for each choice!")
@@ -37,9 +37,9 @@ function Random:calc_csum()
 end
 
 function Random:choose()
-    local r = Math.random() + Math.random(0, self.sum - 1) --chooses decimal between 0 and sum inclusive
+    local r = math.random() + math.random(0, self.sum - 1) --chooses decimal between 0 and sum inclusive
     for i, choice in pairs(self.choices) do
-        if r < self.probabilities[choice] then
+        if r < self.csum[choice] then
             return choice
         end
     end
